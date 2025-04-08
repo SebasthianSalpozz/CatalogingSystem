@@ -1,4 +1,4 @@
-## Trello Ticket
+## Taiga Ticket
 
 Provide the link of the ticket created in the dashboard.
 
