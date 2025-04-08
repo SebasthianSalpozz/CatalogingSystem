@@ -4,8 +4,19 @@ using CatalogingSystem.Services.Interfaces;
 using CatalogingSystem.Services.Implementations;
 using CatalogingSystem.DTOs.Mapping;
 
-
+var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: MyAllowSpecificOrigins,
+        policy =>
+        {
+            policy.WithOrigins("http://localhost:5173") 
+                  .AllowAnyMethod()
+                  .AllowAnyHeader();
+        });
+});
 
 // Add services to the container.
 
@@ -23,6 +34,7 @@ builder.Services.AddScoped<IArchivoAdministrativoService, ArchivoAdministrativoS
 
 var app = builder.Build();
 
+app.UseCors(MyAllowSpecificOrigins);
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
