@@ -1,9 +1,8 @@
-// CatalogingSystem.Api/Controllers/TenantsController.cs
+namespace CatalogingSystem.Api.Controllers;
+
 using CatalogingSystem.DTOs.Dtos;
 using CatalogingSystem.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-
-namespace CatalogingSystem.Api.Controllers;
 
 [ApiController]
 [Route("[controller]")]
@@ -16,10 +15,35 @@ public class TenantsController : ControllerBase
         _tenantService = tenantService;
     }
 
+    [HttpGet]
+    public async Task<IActionResult> GetAllTenants()
+    {
+        try
+        {
+            var tenants = await _tenantService.GetAllTenantsAsync();
+            return Ok(tenants);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { message = $"Error al listar los tenants: {ex.Message}" });
+        }
+    }
+
     [HttpPost]
     public async Task<IActionResult> CreateTenant([FromBody] CreateTenantRequest request)
     {
-        var tenant = await _tenantService.CreateTenantAsync(request);
-        return Ok(new { Message = $"Tenant {tenant.Name} creado correctamente" });
+        try
+        {
+            var tenant = await _tenantService.CreateTenantAsync(request);
+            return CreatedAtAction(nameof(GetAllTenants), new { id = tenant.Id }, tenant);
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { message = $"Error al crear el tenant: {ex.Message}" });
+        }
     }
 }

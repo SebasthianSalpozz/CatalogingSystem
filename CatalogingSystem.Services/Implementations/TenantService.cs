@@ -1,4 +1,3 @@
-// CatalogingSystem.Services/Implementations/TenantService.cs
 using CatalogingSystem.Core.Entities;
 using CatalogingSystem.Data.DbContext;
 using CatalogingSystem.DTOs.Dtos;
@@ -76,5 +75,10 @@ public class TenantService : ITenantService
         }
 
         return tenant;
+    }
+
+    public async Task<List<Tenant>> GetAllTenantsAsync()
+    {
+        return await _baseDbContext.Tenants.ToListAsync();
     }
 }
