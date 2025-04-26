@@ -3,6 +3,8 @@ using CatalogingSystem.Data.DbContext;
 using CatalogingSystem.Services.Interfaces;
 using CatalogingSystem.Services.Implementations;
 using CatalogingSystem.DTOs.Mapping;
+using CatalogingSystem.Core.Interfaces;
+
 
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 var builder = WebApplication.CreateBuilder(args);
@@ -19,18 +21,25 @@ builder.Services.AddCors(options =>
 });
 
 // Add services to the container.
-
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
 
+// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo { Title = "CatalogingSystem API", Version = "v1" });
+    c.OperationFilter<AddTenantHeaderParameter>(); // Añade el filtro
+});
 builder.Services.AddAutoMapper(typeof(ArchivoAdministrativoProfile));
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+builder.Services.AddDbContext<BaseDbContext>(options => options.UseNpgsql(connectionString));
 builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseNpgsql(connectionString));
+
     // options.UseNpgsql(connectionString));
 builder.Services.AddScoped<IArchivoAdministrativoService, ArchivoAdministrativoService>();
+builder.Services.AddScoped<ICurrentTenantService, CurrentTenantService>();
+builder.Services.AddScoped<ITenantService, TenantService>();
 
 var app = builder.Build();
 
@@ -44,9 +53,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
+app.UseMiddleware<TenantResolver>();
 app.UseAuthorization();
-
 app.MapControllers();
 
 app.Run();
