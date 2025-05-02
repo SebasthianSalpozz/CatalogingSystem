@@ -3,17 +3,20 @@ using System;
 using CatalogingSystem.Data.DbContext;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace CatalogingSystem.Data.Migrations
+namespace CatalogingSystem.Data.Migrations.AppDb
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250428213840_AddIdentificationTable")]
+    partial class AddIdentificationTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -73,9 +76,6 @@ namespace CatalogingSystem.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("expediente")
-                        .IsUnique();
-
                     b.ToTable("ArchivosAdministrativos");
                 });
 
@@ -107,22 +107,17 @@ namespace CatalogingSystem.Data.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.HasKey("Id");
+                    b.Property<string>("unit")
+                        .IsRequired()
+                        .HasColumnType("text");
 
-                    b.HasIndex("expediente");
+                    b.HasKey("Id");
 
                     b.ToTable("Identifications");
                 });
 
             modelBuilder.Entity("CatalogingSystem.Core.Entities.Identification", b =>
                 {
-                    b.HasOne("CatalogingSystem.Core.Entities.ArchivoAdministrativo", "ArchivoAdministrativo")
-                        .WithMany()
-                        .HasForeignKey("expediente")
-                        .HasPrincipalKey("expediente")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.OwnsOne("CatalogingSystem.Core.Entities.Author", "author", b1 =>
                         {
                             b1.Property<Guid>("IdentificationId")
@@ -324,8 +319,6 @@ namespace CatalogingSystem.Data.Migrations
                             b1.WithOwner()
                                 .HasForeignKey("IdentificationId");
                         });
-
-                    b.Navigation("ArchivoAdministrativo");
 
                     b.Navigation("author")
                         .IsRequired();
