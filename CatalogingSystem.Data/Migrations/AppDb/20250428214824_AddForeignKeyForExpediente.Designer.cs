@@ -3,17 +3,20 @@ using System;
 using CatalogingSystem.Data.DbContext;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace CatalogingSystem.Data.Migrations
+namespace CatalogingSystem.Data.Migrations.AppDb
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250428214824_AddForeignKeyForExpediente")]
+    partial class AddForeignKeyForExpediente
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -107,6 +110,10 @@ namespace CatalogingSystem.Data.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<string>("unit")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.HasKey("Id");
 
                     b.HasIndex("expediente");
@@ -116,7 +123,7 @@ namespace CatalogingSystem.Data.Migrations
 
             modelBuilder.Entity("CatalogingSystem.Core.Entities.Identification", b =>
                 {
-                    b.HasOne("CatalogingSystem.Core.Entities.ArchivoAdministrativo", "ArchivoAdministrativo")
+                    b.HasOne("CatalogingSystem.Core.Entities.ArchivoAdministrativo", null)
                         .WithMany()
                         .HasForeignKey("expediente")
                         .HasPrincipalKey("expediente")
@@ -324,8 +331,6 @@ namespace CatalogingSystem.Data.Migrations
                             b1.WithOwner()
                                 .HasForeignKey("IdentificationId");
                         });
-
-                    b.Navigation("ArchivoAdministrativo");
 
                     b.Navigation("author")
                         .IsRequired();
