@@ -42,7 +42,6 @@ public partial class ApplicationDbContext : DbContext
             .Property(a => a.documentoOrigen)
             .HasConversion<string>();
 
-        // Asegurar que expediente sea único en ArchivosAdministrativos
         modelBuilder.Entity<ArchivoAdministrativo>()
             .HasIndex(a => a.expediente)
             .IsUnique();
@@ -51,9 +50,8 @@ public partial class ApplicationDbContext : DbContext
         modelBuilder.Entity<Identification>()
             .Property(i => i.Id).HasDefaultValueSql("gen_random_uuid()");
 
-        // Definir la relación con clave foránea
         modelBuilder.Entity<Identification>()
-            .HasOne(i => i.ArchivoAdministrativo) // Especificar la propiedad de navegación
+            .HasOne(i => i.ArchivoAdministrativo)
             .WithMany()
             .HasForeignKey(i => i.expediente)
             .HasPrincipalKey(a => a.expediente)
@@ -86,9 +84,9 @@ public partial class ApplicationDbContext : DbContext
 
         modelBuilder.Entity<GraphicDocumentation>()
             .HasOne(g => g.ArchivoAdministrativo)
-            .WithMany()
-            .HasForeignKey(g => g.expediente)
-            .HasPrincipalKey(a => a.expediente)
+            .WithOne()
+            .HasForeignKey<GraphicDocumentation>(g => g.expediente)
+            .HasPrincipalKey<ArchivoAdministrativo>(a => a.expediente)
             .OnDelete(DeleteBehavior.Restrict);
 
         modelBuilder.Entity<GraphicDocumentation>()
@@ -98,8 +96,7 @@ public partial class ApplicationDbContext : DbContext
             .OwnsOne(g => g.imageAuthor);
 
         modelBuilder.Entity<GraphicDocumentation>()
-            .HasIndex(g => new { g.expediente, g.inventory })
+            .HasIndex(g => g.expediente)
             .IsUnique();
     }
-
 }

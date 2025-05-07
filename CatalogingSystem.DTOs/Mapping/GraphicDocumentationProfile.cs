@@ -8,7 +8,8 @@ public class GraphicDocumentationProfile : Profile
 {
     public GraphicDocumentationProfile()
     {
-        CreateMap<GraphicDocumentationDto, GraphicDocumentation>();
+        CreateMap<GraphicDocumentationDto, GraphicDocumentation>()
+            .ForMember(dest => dest.inventory, opt => opt.Ignore());
         CreateMap<GraphicDocumentation, GraphicDocumentationDto>();
     }
 }

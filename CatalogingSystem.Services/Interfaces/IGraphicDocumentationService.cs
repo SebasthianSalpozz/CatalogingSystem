@@ -6,8 +6,8 @@ using CatalogingSystem.DTOs.Dtos;
 public interface IGraphicDocumentationService
 {
     Task<IEnumerable<GraphicDocumentationDto>> GetGraphicDocumentations();
-    Task<GraphicDocumentationDto?> GetGraphicDocumentation(long expediente, long inventory);
+    Task<GraphicDocumentationDto?> GetGraphicDocumentation(long expediente);
     Task<GraphicDocumentation> CreateGraphicDocumentation(GraphicDocumentationDto dto);
-    Task<bool> UpdateGraphicDocumentation(long expediente, long inventory, GraphicDocumentationDto dto);
-    Task<bool> DeleteGraphicDocumentation(long expediente, long inventory);
+    Task<bool> UpdateGraphicDocumentation(long expediente, GraphicDocumentationDto dto);
+    Task<bool> DeleteGraphicDocumentation(long expediente);
 }

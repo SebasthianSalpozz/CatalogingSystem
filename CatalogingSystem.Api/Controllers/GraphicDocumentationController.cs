@@ -22,10 +22,10 @@ public class GraphicDocumentationController : ControllerBase
         return Ok(await _service.GetGraphicDocumentations());
     }
 
-    [HttpGet("{expediente:long}/{inventory:long}")]
-    public async Task<ActionResult<GraphicDocumentationDto>> GetGraphicDocumentation(long expediente, long inventory)
+    [HttpGet("{expediente:long}")]
+    public async Task<ActionResult<GraphicDocumentationDto>> GetGraphicDocumentation(long expediente)
     {
-        var graphicDoc = await _service.GetGraphicDocumentation(expediente, inventory);
+        var graphicDoc = await _service.GetGraphicDocumentation(expediente);
         return graphicDoc == null ? NotFound() : Ok(graphicDoc);
     }
 
@@ -35,7 +35,7 @@ public class GraphicDocumentationController : ControllerBase
         try
         {
             var graphicDoc = await _service.CreateGraphicDocumentation(dto);
-            return CreatedAtAction(nameof(GetGraphicDocumentation), new { expediente = graphicDoc.expediente, inventory = graphicDoc.inventory }, graphicDoc);
+            return CreatedAtAction(nameof(GetGraphicDocumentation), new { expediente = graphicDoc.expediente }, graphicDoc);
         }
         catch (InvalidOperationException ex)
         {
@@ -43,12 +43,12 @@ public class GraphicDocumentationController : ControllerBase
         }
     }
 
-    [HttpPut("{expediente:long}/{inventory:long}")]
-    public async Task<IActionResult> PutGraphicDocumentation(long expediente, long inventory, [FromBody] GraphicDocumentationDto dto)
+    [HttpPut("{expediente:long}")]
+    public async Task<IActionResult> PutGraphicDocumentation(long expediente, [FromBody] GraphicDocumentationDto dto)
     {
         try
         {
-            var success = await _service.UpdateGraphicDocumentation(expediente, inventory, dto);
+            var success = await _service.UpdateGraphicDocumentation(expediente, dto);
             return success ? NoContent() : NotFound();
         }
         catch (InvalidOperationException ex)
@@ -57,10 +57,10 @@ public class GraphicDocumentationController : ControllerBase
         }
     }
 
-    [HttpDelete("{expediente:long}/{inventory:long}")]
-    public async Task<IActionResult> DeleteGraphicDocumentation(long expediente, long inventory)
+    [HttpDelete("{expediente:long}")]
+    public async Task<IActionResult> DeleteGraphicDocumentation(long expediente)
     {
-        var success = await _service.DeleteGraphicDocumentation(expediente, inventory);
+        var success = await _service.DeleteGraphicDocumentation(expediente);
         return success ? NoContent() : NotFound();
     }
 }

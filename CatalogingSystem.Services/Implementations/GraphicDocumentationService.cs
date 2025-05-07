@@ -26,11 +26,11 @@ public class GraphicDocumentationService : IGraphicDocumentationService
         return _mapper.Map<IEnumerable<GraphicDocumentationDto>>(graphicDocs);
     }
 
-    public async Task<GraphicDocumentationDto?> GetGraphicDocumentation(long expediente, long inventory)
+    public async Task<GraphicDocumentationDto?> GetGraphicDocumentation(long expediente)
     {
         var graphicDoc = await _context.GraphicDocumentations
             .Include(g => g.ArchivoAdministrativo)
-            .FirstOrDefaultAsync(g => g.expediente == expediente && g.inventory == inventory);
+            .FirstOrDefaultAsync(g => g.expediente == expediente);
         return graphicDoc == null ? null : _mapper.Map<GraphicDocumentationDto>(graphicDoc);
     }
 
@@ -52,12 +52,12 @@ public class GraphicDocumentationService : IGraphicDocumentationService
             throw new InvalidOperationException($"No existe una identificación asociada al expediente {dto.Expediente}");
         }
 
-        // Validar unicidad de la combinación expediente-inventory
+        // Validar unicidad del expediente
         bool exists = await _context.GraphicDocumentations
-            .AnyAsync(g => g.expediente == dto.Expediente && g.inventory == identification.inventory);
+            .AnyAsync(g => g.expediente == dto.Expediente);
         if (exists)
         {
-            throw new InvalidOperationException($"Ya existe una documentación gráfica para el expediente {dto.Expediente} e inventario {identification.inventory}");
+            throw new InvalidOperationException($"Ya existe una documentación gráfica para el expediente {dto.Expediente}");
         }
 
         // Validar que, si se proporcionan imágenes, haya al menos una
@@ -76,10 +76,10 @@ public class GraphicDocumentationService : IGraphicDocumentationService
         return graphicDoc;
     }
 
-    public async Task<bool> UpdateGraphicDocumentation(long expediente, long inventory, GraphicDocumentationDto dto)
+    public async Task<bool> UpdateGraphicDocumentation(long expediente, GraphicDocumentationDto dto)
     {
         var graphicDoc = await _context.GraphicDocumentations
-            .FirstOrDefaultAsync(g => g.expediente == expediente && g.inventory == inventory);
+            .FirstOrDefaultAsync(g => g.expediente == expediente);
         if (graphicDoc == null) return false;
 
         // Validar que el expediente exista en ArchivosAdministrativos
@@ -111,10 +111,10 @@ public class GraphicDocumentationService : IGraphicDocumentationService
         return true;
     }
 
-    public async Task<bool> DeleteGraphicDocumentation(long expediente, long inventory)
+    public async Task<bool> DeleteGraphicDocumentation(long expediente)
     {
         var graphicDoc = await _context.GraphicDocumentations
-            .FirstOrDefaultAsync(g => g.expediente == expediente && g.inventory == inventory);
+            .FirstOrDefaultAsync(g => g.expediente == expediente);
         if (graphicDoc == null) return false;
 
         _context.GraphicDocumentations.Remove(graphicDoc);
