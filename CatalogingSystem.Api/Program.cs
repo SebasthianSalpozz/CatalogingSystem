@@ -4,9 +4,12 @@ using CatalogingSystem.Services.Interfaces;
 using CatalogingSystem.Services.Implementations;
 using CatalogingSystem.DTOs.Mapping;
 using CatalogingSystem.Core.Interfaces;
+using DotNetEnv;
 
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 var builder = WebApplication.CreateBuilder(args);
+
+Env.Load();
 
 builder.Services.AddCors(options =>
 {
@@ -28,7 +31,7 @@ builder.Services.AddSwaggerGen(c =>
     c.OperationFilter<AddTenantHeaderParameter>();
 });
 
-builder.Services.AddAutoMapper(typeof(ArchivoAdministrativoProfile), typeof(IdentificationProfile));
+builder.Services.AddAutoMapper(typeof(ArchivoAdministrativoProfile), typeof(IdentificationProfile), typeof(GraphicDocumentationProfile));
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<BaseDbContext>(options => options.UseNpgsql(connectionString));
@@ -38,6 +41,7 @@ builder.Services.AddScoped<IArchivoAdministrativoService, ArchivoAdministrativoS
 builder.Services.AddScoped<ICurrentTenantService, CurrentTenantService>();
 builder.Services.AddScoped<ITenantService, TenantService>();
 builder.Services.AddScoped<IIdentificationService, IdentificationService>();
+builder.Services.AddScoped<IGraphicDocumentationService, GraphicDocumentationService>();
 
 var app = builder.Build();
 

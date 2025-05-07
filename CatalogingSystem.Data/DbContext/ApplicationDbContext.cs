@@ -16,6 +16,7 @@ public partial class ApplicationDbContext : DbContext
 
     public DbSet<ArchivoAdministrativo> ArchivosAdministrativos { get; set; }
     public DbSet<Identification> Identifications { get; set; }
+    public DbSet<GraphicDocumentation> GraphicDocumentations { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -78,5 +79,27 @@ public partial class ApplicationDbContext : DbContext
 
         modelBuilder.Entity<Identification>()
             .OwnsOne(i => i.techniques);
+        
+        // GraphicDocumentation configuration
+        modelBuilder.Entity<GraphicDocumentation>()
+            .Property(g => g.Id).HasDefaultValueSql("gen_random_uuid()");
+
+        modelBuilder.Entity<GraphicDocumentation>()
+            .HasOne(g => g.ArchivoAdministrativo)
+            .WithMany()
+            .HasForeignKey(g => g.expediente)
+            .HasPrincipalKey(a => a.expediente)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<GraphicDocumentation>()
+            .OwnsOne(g => g.dimensions);
+
+        modelBuilder.Entity<GraphicDocumentation>()
+            .OwnsOne(g => g.imageAuthor);
+
+        modelBuilder.Entity<GraphicDocumentation>()
+            .HasIndex(g => new { g.expediente, g.inventory })
+            .IsUnique();
     }
+
 }
