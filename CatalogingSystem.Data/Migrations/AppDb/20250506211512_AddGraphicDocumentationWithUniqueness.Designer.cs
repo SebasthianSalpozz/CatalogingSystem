@@ -4,17 +4,20 @@ using System.Collections.Generic;
 using CatalogingSystem.Data.DbContext;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace CatalogingSystem.Data.Migrations
+namespace CatalogingSystem.Data.Migrations.AppDb
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250506211512_AddGraphicDocumentationWithUniqueness")]
+    partial class AddGraphicDocumentationWithUniqueness
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -121,7 +124,7 @@ namespace CatalogingSystem.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("expediente")
+                    b.HasIndex("expediente", "inventory")
                         .IsUnique();
 
                     b.ToTable("GraphicDocumentations");
@@ -165,9 +168,9 @@ namespace CatalogingSystem.Data.Migrations
             modelBuilder.Entity("CatalogingSystem.Core.Entities.GraphicDocumentation", b =>
                 {
                     b.HasOne("CatalogingSystem.Core.Entities.ArchivoAdministrativo", "ArchivoAdministrativo")
-                        .WithOne()
-                        .HasForeignKey("CatalogingSystem.Core.Entities.GraphicDocumentation", "expediente")
-                        .HasPrincipalKey("CatalogingSystem.Core.Entities.ArchivoAdministrativo", "expediente")
+                        .WithMany()
+                        .HasForeignKey("expediente")
+                        .HasPrincipalKey("expediente")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
