@@ -42,6 +42,7 @@ builder.Services.AddScoped<ICurrentTenantService, CurrentTenantService>();
 builder.Services.AddScoped<ITenantService, TenantService>();
 builder.Services.AddScoped<IIdentificationService, IdentificationService>();
 builder.Services.AddScoped<IGraphicDocumentationService, GraphicDocumentationService>();
+builder.Services.AddScoped<ICatalogService, CatalogService>();
 
 var app = builder.Build();
 
