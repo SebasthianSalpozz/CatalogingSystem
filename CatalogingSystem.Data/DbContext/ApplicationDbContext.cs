@@ -16,6 +16,7 @@ public partial class ApplicationDbContext : DbContext
 
     public DbSet<ArchivoAdministrativo> ArchivosAdministrativos { get; set; }
     public DbSet<Identification> Identifications { get; set; }
+    public DbSet<GraphicDocumentation> GraphicDocumentations { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -41,7 +42,6 @@ public partial class ApplicationDbContext : DbContext
             .Property(a => a.documentoOrigen)
             .HasConversion<string>();
 
-        // Asegurar que expediente sea único en ArchivosAdministrativos
         modelBuilder.Entity<ArchivoAdministrativo>()
             .HasIndex(a => a.expediente)
             .IsUnique();
@@ -50,9 +50,8 @@ public partial class ApplicationDbContext : DbContext
         modelBuilder.Entity<Identification>()
             .Property(i => i.Id).HasDefaultValueSql("gen_random_uuid()");
 
-        // Definir la relación con clave foránea
         modelBuilder.Entity<Identification>()
-            .HasOne(i => i.ArchivoAdministrativo) // Especificar la propiedad de navegación
+            .HasOne(i => i.ArchivoAdministrativo)
             .WithMany()
             .HasForeignKey(i => i.expediente)
             .HasPrincipalKey(a => a.expediente)
@@ -78,5 +77,26 @@ public partial class ApplicationDbContext : DbContext
 
         modelBuilder.Entity<Identification>()
             .OwnsOne(i => i.techniques);
+        
+        // GraphicDocumentation configuration
+        modelBuilder.Entity<GraphicDocumentation>()
+            .Property(g => g.Id).HasDefaultValueSql("gen_random_uuid()");
+
+        modelBuilder.Entity<GraphicDocumentation>()
+            .HasOne(g => g.ArchivoAdministrativo)
+            .WithOne()
+            .HasForeignKey<GraphicDocumentation>(g => g.expediente)
+            .HasPrincipalKey<ArchivoAdministrativo>(a => a.expediente)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<GraphicDocumentation>()
+            .OwnsOne(g => g.dimensions);
+
+        modelBuilder.Entity<GraphicDocumentation>()
+            .OwnsOne(g => g.imageAuthor);
+
+        modelBuilder.Entity<GraphicDocumentation>()
+            .HasIndex(g => g.expediente)
+            .IsUnique();
     }
 }
