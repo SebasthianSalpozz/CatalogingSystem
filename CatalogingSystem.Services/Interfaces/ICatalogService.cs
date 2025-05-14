@@ -6,11 +6,13 @@ using System.Threading.Tasks;
 
 public interface ICatalogService
 {
-    Task<IEnumerable<CatalogItemDto>> GetCatalogItems();
+    Task<PagedResultDto<CatalogItemDto>> GetCatalogItems(int page = 1, int size = 10);
     Task<CatalogItemDto?> GetCatalogItem(long expediente);
-    Task<IEnumerable<CatalogItemDto>> SearchCatalogItems(
+    Task<PagedResultDto<CatalogItemDto>> SearchCatalogItems(
         string? materialName,
         string? authorName,
         string? titleName,
-        string? genericClassification);
+        string? genericClassification,
+        int page = 1,
+        int size = 10);
 }

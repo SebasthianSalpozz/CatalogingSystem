@@ -17,13 +17,17 @@ public class CatalogController : ControllerBase
     }
 
     /// <summary>
-    /// Retrieves all catalog items.
+    /// Retrieves paginated catalog items.
     /// </summary>
-    /// <returns>A list of catalog items.</returns>
+    /// <param name="page">The page number (default is 1).</param>
+    /// <param name="size">The number of items per page (default is 10).</param>
+    /// <returns>A paginated list of catalog items with metadata.</returns>
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<CatalogItemDto>>> GetCatalogItems()
+    public async Task<ActionResult<PagedResultDto<CatalogItemDto>>> GetCatalogItems(
+        [FromQuery] int page = 1,
+        [FromQuery] int size = 10)
     {
-        return Ok(await _service.GetCatalogItems());
+        return Ok(await _service.GetCatalogItems(page, size));
     }
 
     /// <summary>
@@ -39,21 +43,25 @@ public class CatalogController : ControllerBase
     }
 
     /// <summary>
-    /// Searches catalog items by specified criteria.
+    /// Searches catalog items by specified criteria with pagination.
     /// </summary>
     /// <param name="materialName">The material name to filter by.</param>
     /// <param name="authorName">The author name to filter by.</param>
     /// <param name="titleName">The title name to filter by.</param>
     /// <param name="genericClassification">The generic classification to filter by.</param>
-    /// <returns>A list of matching catalog items.</returns>
+    /// <param name="page">The page number (default is 1).</param>
+    /// <param name="size">The number of items per page (default is 10).</param>
+    /// <returns>A paginated list of matching catalog items with metadata.</returns>
     [HttpGet("search")]
-    public async Task<ActionResult<IEnumerable<CatalogItemDto>>> SearchCatalogItems(
+    public async Task<ActionResult<PagedResultDto<CatalogItemDto>>> SearchCatalogItems(
         [FromQuery] string? materialName,
         [FromQuery] string? authorName,
         [FromQuery] string? titleName,
-        [FromQuery] string? genericClassification)
+        [FromQuery] string? genericClassification,
+        [FromQuery] int page = 1,
+        [FromQuery] int size = 10)
     {
-        var items = await _service.SearchCatalogItems(materialName, authorName, titleName, genericClassification);
+        var items = await _service.SearchCatalogItems(materialName, authorName, titleName, genericClassification, page, size);
         return Ok(items);
     }
 }
