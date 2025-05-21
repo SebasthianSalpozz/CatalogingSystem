@@ -15,4 +15,5 @@ public interface ICatalogService
         string? genericClassification,
         int page = 1,
         int size = 10);
+    Task<bool> DeleteCatalogItem(long expediente);
 }

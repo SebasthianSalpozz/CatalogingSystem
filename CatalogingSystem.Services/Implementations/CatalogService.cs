@@ -157,4 +157,29 @@ public class CatalogService : ICatalogService
             PageSize = size
         };
     }
+    public async Task<bool> DeleteCatalogItem(long expediente)
+    {
+        var archivo = await _context.ArchivosAdministrativos
+            .FirstOrDefaultAsync(a => a.expediente == expediente);
+        if (archivo == null) return false;
+
+        var graphicDoc = await _context.GraphicDocumentations
+            .FirstOrDefaultAsync(g => g.expediente == expediente);
+        if (graphicDoc != null)
+        {
+            _context.GraphicDocumentations.Remove(graphicDoc);
+        }
+
+        var identification = await _context.Identifications
+            .FirstOrDefaultAsync(i => i.expediente == expediente);
+        if (identification != null)
+        {
+            _context.Identifications.Remove(identification);
+        }
+
+        _context.ArchivosAdministrativos.Remove(archivo);
+
+        await _context.SaveChangesAsync();
+        return true;
+    }
 }
