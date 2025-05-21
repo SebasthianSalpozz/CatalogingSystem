@@ -11,5 +11,7 @@ public class GraphicDocumentationProfile : Profile
         CreateMap<GraphicDocumentationDto, GraphicDocumentation>()
             .ForMember(dest => dest.inventory, opt => opt.Ignore());
         CreateMap<GraphicDocumentation, GraphicDocumentationDto>();
+        CreateMap<UpdateGraphicDocumentationDto, GraphicDocumentation>()
+            .ForMember(dest => dest.inventory, opt => opt.Ignore());
     }
 }

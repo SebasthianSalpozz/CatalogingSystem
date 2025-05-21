@@ -44,7 +44,7 @@ public class GraphicDocumentationController : ControllerBase
     }
 
     [HttpPut("{expediente:long}")]
-    public async Task<IActionResult> PutGraphicDocumentation(long expediente, [FromBody] GraphicDocumentationDto dto)
+    public async Task<IActionResult> PutGraphicDocumentation(long expediente, [FromBody] UpdateGraphicDocumentationDto dto)
     {
         try
         {
