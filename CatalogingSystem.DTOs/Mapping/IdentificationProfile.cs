@@ -9,8 +9,7 @@ public class IdentificationProfile : Profile
     public IdentificationProfile()
     {
         CreateMap<IdentificationDto, Identification>();
-
-        CreateMap<Identification, IdentificationDto>()
-            .ForMember(dest => dest.Unit, opt => opt.Ignore());
+        CreateMap<Identification, IdentificationDto>();
+        CreateMap<UpdateIdentificationDto, Identification>();
     }
 }

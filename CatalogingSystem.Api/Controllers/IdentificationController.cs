@@ -44,7 +44,7 @@ public class IdentificationController : ControllerBase
     }
 
     [HttpPut("{expediente:long}")]
-    public async Task<IActionResult> PutIdentification(long expediente, IdentificationDto dto)
+    public async Task<IActionResult> PutIdentification(long expediente, UpdateIdentificationDto dto)
     {
         var success = await _service.UpdateIdentification(expediente, dto);
         return success ? NoContent() : NotFound();

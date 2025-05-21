@@ -21,40 +21,19 @@ public class IdentificationService : IIdentificationService
     public async Task<IEnumerable<IdentificationDto>> GetIdentifications()
     {
         var identifications = await _context.Identifications
-            .Include(i => i.ArchivoAdministrativo) // Incluir la relación
+            .Include(i => i.ArchivoAdministrativo)
             .ToListAsync();
 
-        var dtos = _mapper.Map<IEnumerable<IdentificationDto>>(identifications);
-        foreach (var dto in dtos)
-        {
-            var archivo = await _context.ArchivosAdministrativos
-                .FirstOrDefaultAsync(a => a.expediente == dto.Expediente);
-            if (archivo != null)
-            {
-                dto.Unit = archivo.institucion;
-            }
-        }
-
-        return dtos;
+        return _mapper.Map<IEnumerable<IdentificationDto>>(identifications);
     }
 
     public async Task<IdentificationDto?> GetIdentification(long expediente)
     {
         var identification = await _context.Identifications
-            .Include(i => i.ArchivoAdministrativo) // Incluir la relación
+            .Include(i => i.ArchivoAdministrativo)
             .FirstOrDefaultAsync(i => i.expediente == expediente);
 
-        if (identification == null) return null;
-
-        var dto = _mapper.Map<IdentificationDto>(identification);
-        var archivo = await _context.ArchivosAdministrativos
-            .FirstOrDefaultAsync(a => a.expediente == dto.Expediente);
-        if (archivo != null)
-        {
-            dto.Unit = archivo.institucion;
-        }
-
-        return dto;
+        return identification == null ? null : _mapper.Map<IdentificationDto>(identification);
     }
 
     public async Task<Identification> CreateIdentification(IdentificationDto dto)
@@ -83,14 +62,12 @@ public class IdentificationService : IIdentificationService
         return identification;
     }
 
-    public async Task<bool> UpdateIdentification(long expediente, IdentificationDto dto)
+    public async Task<bool> UpdateIdentification(long expediente, UpdateIdentificationDto dto)
     {
         var identification = await _context.Identifications.FirstOrDefaultAsync(i => i.expediente == expediente);
         if (identification == null) return false;
 
-        var originalExpediente = identification.expediente;
         _mapper.Map(dto, identification);
-        identification.expediente = originalExpediente;
         await _context.SaveChangesAsync();
         return true;
     }
