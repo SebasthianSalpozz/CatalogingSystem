@@ -3,10 +3,12 @@ namespace CatalogingSystem.Api.Controllers;
 using CatalogingSystem.Core.Entities;
 using CatalogingSystem.DTOs.Dtos;
 using CatalogingSystem.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
 [Route("[controller]")]
+[Authorize]
 public class GraphicDocumentationController : ControllerBase
 {
     private readonly IGraphicDocumentationService _service;
@@ -30,6 +32,7 @@ public class GraphicDocumentationController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Policy = "FullAccessPolicy")]
     public async Task<ActionResult<GraphicDocumentation>> PostGraphicDocumentation([FromBody] GraphicDocumentationDto dto)
     {
         try
@@ -44,6 +47,7 @@ public class GraphicDocumentationController : ControllerBase
     }
 
     [HttpPut("{expediente:long}")]
+    [Authorize(Policy = "FullAccessPolicy")]
     public async Task<IActionResult> PutGraphicDocumentation(long expediente, [FromBody] UpdateGraphicDocumentationDto dto)
     {
         try
@@ -58,6 +62,7 @@ public class GraphicDocumentationController : ControllerBase
     }
 
     [HttpDelete("{expediente:long}")]
+    [Authorize(Policy = "FullAccessPolicy")]
     public async Task<IActionResult> DeleteGraphicDocumentation(long expediente)
     {
         var success = await _service.DeleteGraphicDocumentation(expediente);

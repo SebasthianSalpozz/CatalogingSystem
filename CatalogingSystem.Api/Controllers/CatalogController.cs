@@ -2,11 +2,13 @@ namespace CatalogingSystem.Api.Controllers;
 
 using CatalogingSystem.DTOs.Dtos;
 using CatalogingSystem.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 
 [ApiController]
 [Route("[controller]")]
+[Authorize]
 public class CatalogController : ControllerBase
 {
     private readonly ICatalogService _service;

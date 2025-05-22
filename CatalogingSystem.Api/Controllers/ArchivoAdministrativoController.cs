@@ -1,4 +1,5 @@
 namespace CatalogingSystem.Api.Controllers;
+
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -6,9 +7,11 @@ using CatalogingSystem.Core.Entities;
 using CatalogingSystem.DTOs.Dtos;
 using CatalogingSystem.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 [ApiController]
 [Route("[controller]")]
+[Authorize]
 public class ArchivoAdministrativoController : ControllerBase
 {
     private readonly IArchivoAdministrativoService _service;
@@ -32,6 +35,7 @@ public class ArchivoAdministrativoController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Policy = "FullAccessPolicy")]
     public async Task<ActionResult<ArchivoAdministrativo>> PostArchivoAdministrativo(ArchivoAdministrativoDto dto)
     {
         try
@@ -46,6 +50,7 @@ public class ArchivoAdministrativoController : ControllerBase
     }
 
     [HttpPut("{expediente:long}")]
+    [Authorize(Policy = "FullAccessPolicy")]
     public async Task<IActionResult> PutArchivoAdministrativo(long expediente, ArchivoAdministrativoDto dto)
     {
         var success = await _service.UpdateArchivoAdministrativo(expediente, dto);
@@ -53,6 +58,7 @@ public class ArchivoAdministrativoController : ControllerBase
     }
 
     [HttpDelete("{expediente:long}")]
+    [Authorize(Policy = "FullAccessPolicy")]
     public async Task<IActionResult> DeleteArchivoAdministrativo(long expediente)
     {
         var success = await _service.DeleteArchivoAdministrativo(expediente);

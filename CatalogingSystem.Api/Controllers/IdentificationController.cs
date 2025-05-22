@@ -3,10 +3,12 @@ namespace CatalogingSystem.Api.Controllers;
 using CatalogingSystem.Core.Entities;
 using CatalogingSystem.DTOs.Dtos;
 using CatalogingSystem.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
 [Route("[controller]")]
+[Authorize]
 public class IdentificationController : ControllerBase
 {
     private readonly IIdentificationService _service;
@@ -30,6 +32,7 @@ public class IdentificationController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Policy = "FullAccessPolicy")]
     public async Task<ActionResult<Identification>> PostIdentification(IdentificationDto dto)
     {
         try
@@ -44,6 +47,7 @@ public class IdentificationController : ControllerBase
     }
 
     [HttpPut("{expediente:long}")]
+    [Authorize(Policy = "FullAccessPolicy")]
     public async Task<IActionResult> PutIdentification(long expediente, UpdateIdentificationDto dto)
     {
         var success = await _service.UpdateIdentification(expediente, dto);

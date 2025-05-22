@@ -17,6 +17,7 @@ public partial class ApplicationDbContext : DbContext
     public DbSet<ArchivoAdministrativo> ArchivosAdministrativos { get; set; }
     public DbSet<Identification> Identifications { get; set; }
     public DbSet<GraphicDocumentation> GraphicDocumentations { get; set; }
+    public DbSet<User> Users { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -98,5 +99,13 @@ public partial class ApplicationDbContext : DbContext
         modelBuilder.Entity<GraphicDocumentation>()
             .HasIndex(g => g.expediente)
             .IsUnique();
+        
+        modelBuilder.Entity<User>()
+            .Property(u => u.Id).HasDefaultValueSql("gen_random_uuid()");
+
+        modelBuilder.Entity<User>()
+            .HasIndex(u => new { u.Username, u.TenantId })
+            .IsUnique();
+        
     }
 }
