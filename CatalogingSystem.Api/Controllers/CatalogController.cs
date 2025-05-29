@@ -7,7 +7,6 @@ namespace CatalogingSystem.Api.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-[Authorize(Roles = "Director,Investigador")]
 public class CatalogController : ControllerBase
 {
     private readonly ICatalogService _service;
@@ -24,6 +23,7 @@ public class CatalogController : ControllerBase
     /// <param name="size">The number of items per page (default is 10).</param>
     /// <returns>A paginated list of catalog items with metadata.</returns>
     [HttpGet]
+    [Authorize(Policy = "ArchivoAdminRead")]
     public async Task<ActionResult<PagedResultDto<CatalogItemDto>>> GetCatalogItems(
         [FromQuery] int page = 1,
         [FromQuery] int size = 10)
@@ -42,6 +42,7 @@ public class CatalogController : ControllerBase
     /// <param name="size">The number of items per page (default is 10).</param>
     /// <returns>A paginated list of matching catalog items with metadata.</returns>
     [HttpGet("search")]
+    [Authorize(Policy = "ArchivoAdminRead")]
     public async Task<ActionResult<PagedResultDto<CatalogItemDto>>> GetCatalogItems(
         [FromQuery] long? expediente = null,
         [FromQuery] string? materialName = null,
@@ -78,6 +79,7 @@ public class CatalogController : ControllerBase
     /// <param name="expediente">The expediente number.</param>
     /// <returns>NoContent if successful; otherwise, NotFound.</returns>
     [HttpDelete("{expediente:long}")]
+    [Authorize(Policy = "ArchivoAdminWrite")]
     public async Task<IActionResult> DeleteCatalogItem(long expediente)
     {
         var success = await _service.DeleteCatalogItem(expediente);

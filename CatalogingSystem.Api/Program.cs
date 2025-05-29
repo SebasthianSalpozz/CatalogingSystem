@@ -115,6 +115,23 @@ builder.Services.AddSwaggerGen(c =>
         }
     });
 });
+builder.Services.AddAuthorization(options =>
+{
+    // Política para solo lectura (GET)
+    options.AddPolicy("ArchivoAdminRead", policy =>
+        policy.RequireAssertion(context =>
+            context.User.IsInRole("Director") ||
+            (context.User.IsInRole("Investigador") &&
+             (context.User.HasClaim("PermissionLevel", "ReadOnly") ||
+              context.User.HasClaim("PermissionLevel", "ReadWrite")))));
+
+    // Política para lectura y escritura (GET, POST, PUT, DELETE)
+    options.AddPolicy("ArchivoAdminWrite", policy =>
+        policy.RequireAssertion(context =>
+            context.User.IsInRole("Director") ||
+            (context.User.IsInRole("Investigador") &&
+             context.User.HasClaim("PermissionLevel", "ReadWrite"))));
+});
 
 builder.Services.AddAutoMapper(typeof(ArchivoAdministrativoProfile), typeof(IdentificationProfile), typeof(GraphicDocumentationProfile), typeof(CatalogItemProfile));
 

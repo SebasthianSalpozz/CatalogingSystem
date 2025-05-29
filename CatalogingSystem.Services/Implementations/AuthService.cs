@@ -54,6 +54,12 @@ public class AuthService : IAuthService
             claims.Add(new Claim(ClaimTypes.Role, role));
         }
 
+        // Añadir el claim de PermissionLevel para Investigadores
+        if (roles.Contains("Investigador") && user.PermissionLevel.HasValue)
+        {
+            claims.Add(new Claim("PermissionLevel", user.PermissionLevel.Value.ToString()));
+        }
+
         // Leer las variables de entorno directamente
         var jwtKey = Environment.GetEnvironmentVariable("Jwt__Key");
         var jwtIssuer = Environment.GetEnvironmentVariable("Jwt__Issuer");

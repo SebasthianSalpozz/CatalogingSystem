@@ -7,6 +7,7 @@ namespace CatalogingSystem.Api.Controllers;
 
 [ApiController]
 [Route("[controller]")]
+[Authorize(Roles = "Director")]
 public class UsersController : ControllerBase
 {
     private readonly IUserService _userService;

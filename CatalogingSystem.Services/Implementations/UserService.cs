@@ -5,6 +5,7 @@ using CatalogingSystem.Data.DbContext;
 using CatalogingSystem.Services.Interfaces;
 using CatalogingSystem.DTOs;
 using Microsoft.EntityFrameworkCore;
+using CatalogingSystem.Core.Enums;
 
 namespace CatalogingSystem.Services.Implementations;
 
@@ -26,15 +27,35 @@ public class UserService : IUserService
     public async Task<User> CreateUserAsync(CreateUserRequestDto request)
     {
         // Validar que el rol sea permitido
-        if (!Enum.TryParse<UserRole>(request.Role, true, out _))
+        if (!Enum.TryParse<UserRole>(request.Role, true, out var role))
         {
             throw new InvalidOperationException($"Rol inválido: {request.Role}. Solo se permiten 'Director' e 'Investigador'.");
+        }
+
+        // Validar el nivel de permisos para Investigadores
+        InvestigatorPermissionLevel? permissionLevel = null;
+        if (role == UserRole.Investigador)
+        {
+            if (string.IsNullOrEmpty(request.PermissionLevel))
+            {
+                throw new InvalidOperationException("El nivel de permisos es requerido para el rol Investigador.");
+            }
+            if (!Enum.TryParse<InvestigatorPermissionLevel>(request.PermissionLevel, true, out var parsedPermissionLevel))
+            {
+                throw new InvalidOperationException($"Nivel de permisos inválido: {request.PermissionLevel}. Solo se permiten 'ReadOnly' o 'ReadWrite'.");
+            }
+            permissionLevel = parsedPermissionLevel;
+        }
+        else if (!string.IsNullOrEmpty(request.PermissionLevel))
+        {
+            throw new InvalidOperationException("El nivel de permisos solo se aplica al rol Investigador.");
         }
 
         var user = new User
         {
             UserName = request.Username,
-            TenantId = request.TenantId
+            TenantId = request.TenantId,
+            PermissionLevel = permissionLevel
         };
 
         var result = await _userManager.CreateAsync(user, request.Password);

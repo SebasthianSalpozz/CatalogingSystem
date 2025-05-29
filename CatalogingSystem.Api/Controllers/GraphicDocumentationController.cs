@@ -3,6 +3,7 @@ namespace CatalogingSystem.Api.Controllers;
 using CatalogingSystem.Core.Entities;
 using CatalogingSystem.DTOs.Dtos;
 using CatalogingSystem.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
@@ -17,12 +18,14 @@ public class GraphicDocumentationController : ControllerBase
     }
 
     [HttpGet]
+    [Authorize(Policy = "ArchivoAdminRead")]
     public async Task<ActionResult<IEnumerable<GraphicDocumentationDto>>> GetGraphicDocumentations()
     {
         return Ok(await _service.GetGraphicDocumentations());
     }
 
     [HttpGet("{expediente:long}")]
+    [Authorize(Policy = "ArchivoAdminRead")]
     public async Task<ActionResult<GraphicDocumentationDto>> GetGraphicDocumentation(long expediente)
     {
         var graphicDoc = await _service.GetGraphicDocumentation(expediente);
@@ -30,6 +33,7 @@ public class GraphicDocumentationController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Policy = "ArchivoAdminWrite")]
     public async Task<ActionResult<GraphicDocumentation>> PostGraphicDocumentation([FromBody] GraphicDocumentationDto dto)
     {
         try
@@ -44,6 +48,7 @@ public class GraphicDocumentationController : ControllerBase
     }
 
     [HttpPut("{expediente:long}")]
+    [Authorize(Policy = "ArchivoAdminWrite")]
     public async Task<IActionResult> PutGraphicDocumentation(long expediente, [FromBody] UpdateGraphicDocumentationDto dto)
     {
         try
@@ -58,6 +63,7 @@ public class GraphicDocumentationController : ControllerBase
     }
 
     [HttpDelete("{expediente:long}")]
+    [Authorize(Policy = "ArchivoAdminWrite")]
     public async Task<IActionResult> DeleteGraphicDocumentation(long expediente)
     {
         var success = await _service.DeleteGraphicDocumentation(expediente);
