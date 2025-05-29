@@ -1,10 +1,11 @@
-namespace CatalogingSystem.Data.DbContext;
-
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using CatalogingSystem.Core.Entities;
 using CatalogingSystem.Core.Interfaces;
-using Microsoft.EntityFrameworkCore;
 
-public partial class ApplicationDbContext : DbContext
+namespace CatalogingSystem.Data.DbContext;
+
+public partial class ApplicationDbContext : IdentityDbContext<User>
 {
     private readonly ICurrentTenantService _tenantService;
 
@@ -98,5 +99,9 @@ public partial class ApplicationDbContext : DbContext
         modelBuilder.Entity<GraphicDocumentation>()
             .HasIndex(g => g.expediente)
             .IsUnique();
+
+        modelBuilder.Entity<User>()
+            .Property(u => u.TenantId)
+            .IsRequired();
     }
 }

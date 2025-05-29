@@ -1,14 +1,17 @@
-namespace CatalogingSystem.Api.Controllers;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using CatalogingSystem.Core.Entities;
 using CatalogingSystem.DTOs.Dtos;
 using CatalogingSystem.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+
+namespace CatalogingSystem.Api.Controllers;
 
 [ApiController]
 [Route("[controller]")]
+[Authorize(Roles = "Director")]
 public class ArchivoAdministrativoController : ControllerBase
 {
     private readonly IArchivoAdministrativoService _service;

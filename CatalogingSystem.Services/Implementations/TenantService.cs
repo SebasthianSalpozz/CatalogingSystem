@@ -24,7 +24,7 @@ public class TenantService : ITenantService
 
     public async Task<Tenant> CreateTenantAsync(CreateTenantRequest request)
     {
-        string tenantId = $"tenant_{request.ISIL}";
+        string tenantId = $"tenant-{request.ISIL}";
 
         if (await _baseDbContext.Tenants.AnyAsync(t => t.Id == tenantId))
             throw new InvalidOperationException($"El tenant con ISIL {request.ISIL} ya existe.");

@@ -1,5 +1,9 @@
-// CatalogingSystem.Api/Middleware/TenantResolver.cs
+using System.Security.Claims;
 using CatalogingSystem.Core.Interfaces;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Primitives;
+
+namespace CatalogingSystem.Api.Middleware;
 
 public class TenantResolver
 {
@@ -12,29 +16,74 @@ public class TenantResolver
 
     public async Task InvokeAsync(HttpContext context, ICurrentTenantService tenantService)
     {
+        StringValues tenantIdFromHeader;
+        string? tenantId = null;
+
         if (context.Request.Path.StartsWithSegments("/Tenants"))
         {
             await _next(context);
             return;
         }
 
-        if (context.Request.Headers.TryGetValue("tenant", out var tenantId))
+        if (context.Request.Path.StartsWithSegments("/Auth"))
         {
-            try
+            if (context.Request.Headers.TryGetValue("tenant", out tenantIdFromHeader))
             {
-                await tenantService.SetTenantAsync(tenantId);
+                tenantId = tenantIdFromHeader.ToString();
+                try
+                {
+                    await tenantService.SetTenantAsync(tenantId);
+                }
+                catch (Exception ex)
+                {
+                    context.Response.StatusCode = 400;
+                    await context.Response.WriteAsync($"Error setting tenant: {ex.Message}");
+                    return;
+                }
             }
-            catch (Exception ex)
+            else
             {
                 context.Response.StatusCode = 400;
-                await context.Response.WriteAsync($"Error al establecer el tenant: {ex.Message}");
+                await context.Response.WriteAsync("Header 'tenant' is required for authentication.");
                 return;
             }
+
+            await _next(context);
+            return;
+        }
+
+        string? tenantIdFromToken = null;
+        if (context.User.Identity?.IsAuthenticated == true)
+        {
+            tenantIdFromToken = context.User.FindFirst("tenantId")?.Value;
+        }
+
+        if (context.Request.Headers.TryGetValue("tenant", out tenantIdFromHeader))
+        {
+            tenantId = tenantIdFromHeader.ToString();
         }
         else
         {
             context.Response.StatusCode = 400;
-            await context.Response.WriteAsync("Header 'tenant' es requerido para esta operación.");
+            await context.Response.WriteAsync("Header 'tenant' is required for this operation.");
+            return;
+        }
+
+        if (tenantIdFromToken != null && tenantIdFromToken != tenantId)
+        {
+            context.Response.StatusCode = 403;
+            await context.Response.WriteAsync("Tenant in token does not match tenant in header.");
+            return;
+        }
+
+        try
+        {
+            await tenantService.SetTenantAsync(tenantId);
+        }
+        catch (Exception ex)
+        {
+            context.Response.StatusCode = 400;
+            await context.Response.WriteAsync($"Error setting tenant: {ex.Message}");
             return;
         }
 

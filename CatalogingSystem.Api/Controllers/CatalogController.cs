@@ -1,12 +1,13 @@
-namespace CatalogingSystem.Api.Controllers;
-
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using CatalogingSystem.DTOs.Dtos;
 using CatalogingSystem.Services.Interfaces;
-using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
+
+namespace CatalogingSystem.Api.Controllers;
 
 [ApiController]
 [Route("[controller]")]
+[Authorize(Roles = "Director,Investigador")]
 public class CatalogController : ControllerBase
 {
     private readonly ICatalogService _service;
@@ -70,6 +71,7 @@ public class CatalogController : ControllerBase
         var items = await _service.SearchCatalogItems(materialName, authorName, titleName, genericClassification, page, size);
         return Ok(items);
     }
+
     /// <summary>
     /// Deletes a catalog item and all related data by expediente.
     /// </summary>
@@ -80,5 +82,5 @@ public class CatalogController : ControllerBase
     {
         var success = await _service.DeleteCatalogItem(expediente);
         return success ? NoContent() : NotFound();
-    }   
+    }
 }
