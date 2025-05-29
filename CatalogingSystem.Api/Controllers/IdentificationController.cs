@@ -3,6 +3,7 @@ namespace CatalogingSystem.Api.Controllers;
 using CatalogingSystem.Core.Entities;
 using CatalogingSystem.DTOs.Dtos;
 using CatalogingSystem.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
@@ -17,12 +18,14 @@ public class IdentificationController : ControllerBase
     }
 
     [HttpGet]
+    [Authorize(Policy = "ArchivoAdminRead")]
     public async Task<ActionResult<IEnumerable<IdentificationDto>>> GetIdentifications()
     {
         return Ok(await _service.GetIdentifications());
     }
 
     [HttpGet("{expediente:long}")]
+    [Authorize(Policy = "ArchivoAdminRead")]
     public async Task<ActionResult<IdentificationDto>> GetIdentification(long expediente)
     {
         var identification = await _service.GetIdentification(expediente);
@@ -30,6 +33,7 @@ public class IdentificationController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Policy = "ArchivoAdminWrite")]
     public async Task<ActionResult<Identification>> PostIdentification(IdentificationDto dto)
     {
         try
@@ -44,6 +48,7 @@ public class IdentificationController : ControllerBase
     }
 
     [HttpPut("{expediente:long}")]
+    [Authorize(Policy = "ArchivoAdminWrite")]
     public async Task<IActionResult> PutIdentification(long expediente, UpdateIdentificationDto dto)
     {
         var success = await _service.UpdateIdentification(expediente, dto);
@@ -51,6 +56,7 @@ public class IdentificationController : ControllerBase
     }
 
     [HttpDelete("{expediente:long}")]
+    [Authorize(Policy = "ArchivoAdminWrite")]
     public async Task<IActionResult> DeleteIdentification(long expediente)
     {
         var success = await _service.DeleteIdentification(expediente);
