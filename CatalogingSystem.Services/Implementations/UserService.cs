@@ -76,15 +76,75 @@ public class UserService : IUserService
         return user;
     }
 
-    public async Task<List<User>> GetUsersAsync()
+    public async Task<List<UserDto>> GetUsersAsync()
     {
         if (string.IsNullOrEmpty(_tenantService.TenantId))
         {
             throw new InvalidOperationException("No tenant context available.");
         }
 
-        return await _userManager.Users
+        var users = await _userManager.Users
             .Where(u => u.TenantId == _tenantService.TenantId)
             .ToListAsync();
+
+        var userDtos = new List<UserDto>();
+
+        foreach (var user in users)
+        {
+            var roles = await _userManager.GetRolesAsync(user);
+            var role = roles.FirstOrDefault(); 
+
+            userDtos.Add(new UserDto
+            {
+                Id = user.Id,
+                UserName = user.UserName,
+                TenantId = user.TenantId,
+                Role = role,
+                PermissionLevel = role == "Investigador" ? user.PermissionLevel?.ToString() : null
+            });
+        }
+
+        return userDtos;
+    }
+
+    public async Task<bool> UpdateUserAsync(string userId, UpdateUserRequestDto request)
+    {
+        var user = await _userManager.FindByIdAsync(userId);
+        if (user == null)
+        {
+            return false;
+        }
+        if (!string.IsNullOrEmpty(request.Username))
+        {
+            user.UserName = request.Username;
+        }
+        if (!string.IsNullOrEmpty(request.Password))
+        {
+            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+            var result = await _userManager.ResetPasswordAsync(user, token, request.Password);
+            if (!result.Succeeded)
+            {
+                throw new InvalidOperationException("Error al actualizar la contraseña.");
+            }
+        }
+        if (!string.IsNullOrEmpty(request.Role))
+        {
+            var currentRoles = await _userManager.GetRolesAsync(user);
+            await _userManager.RemoveFromRolesAsync(user, currentRoles);
+            await _userManager.AddToRoleAsync(user, request.Role);
+        }
+        if (!string.IsNullOrEmpty(request.PermissionLevel))
+        {
+            if (Enum.TryParse<InvestigatorPermissionLevel>(request.PermissionLevel, true, out var permissionLevel))
+            {
+                user.PermissionLevel = permissionLevel;
+            }
+            else
+            {
+                throw new InvalidOperationException("Nivel de permisos inválido.");
+            }
+        }
+        var updateResult = await _userManager.UpdateAsync(user);
+        return updateResult.Succeeded;
     }
 }

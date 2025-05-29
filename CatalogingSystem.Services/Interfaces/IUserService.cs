@@ -6,5 +6,6 @@ namespace CatalogingSystem.Services.Interfaces;
 public interface IUserService
 {
     Task<User> CreateUserAsync(CreateUserRequestDto request);
-    Task<List<User>> GetUsersAsync();
+    Task<List<UserDto>> GetUsersAsync();
+    Task<bool> UpdateUserAsync(string userId, UpdateUserRequestDto request);
 }

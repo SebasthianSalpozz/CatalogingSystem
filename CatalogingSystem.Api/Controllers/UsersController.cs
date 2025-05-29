@@ -23,7 +23,6 @@ public class UsersController : ControllerBase
     /// <param name="request">The user creation request.</param>
     /// <returns>The created user details if successful; otherwise, an error.</returns>
     [HttpPost]
-    [HttpPost]
     public async Task<IActionResult> CreateUser([FromBody] CreateUserRequestDto request)
     {
         try
@@ -51,11 +50,29 @@ public class UsersController : ControllerBase
         try
         {
             var users = await _userService.GetUsersAsync();
-            return Ok(users.Select(u => new { u.Id, u.UserName, u.TenantId }));
+            return Ok(users);
         }
         catch (Exception ex)
         {
             return StatusCode(500, new { message = $"Error retrieving users: {ex.Message}" });
+        }
+    }
+
+    [HttpPut("{userId}")]
+    public async Task<IActionResult> UpdateUser(string userId, [FromBody] UpdateUserRequestDto request)
+    {
+        try
+        {
+            var success = await _userService.UpdateUserAsync(userId, request);
+            return success ? NoContent() : NotFound();
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { message = $"Error al actualizar el usuario: {ex.Message}" });
         }
     }
 }
