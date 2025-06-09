@@ -1,7 +1,9 @@
 using CatalogingSystem.Core.Entities;
+using CatalogingSystem.Core.Interfaces;
 using CatalogingSystem.Data.DbContext;
 using CatalogingSystem.DTOs.Dtos;
 using CatalogingSystem.Services.Interfaces;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -29,7 +31,8 @@ public class TenantService : ITenantService
         if (await _baseDbContext.Tenants.AnyAsync(t => t.Id == tenantId))
             throw new InvalidOperationException($"El tenant con ISIL {request.ISIL} ya existe.");
 
-        string defaultConnection = _configuration.GetConnectionString("DefaultConnection");
+        string defaultConnection = _configuration.GetConnectionString("DefaultConnection") 
+            ?? throw new InvalidOperationException("La cadena de conexión por defecto no está configurada.");
         var builder = new NpgsqlConnectionStringBuilder(defaultConnection);
         string tenantDbName = $"CatalogingSystem-db-{tenantId}";
         builder.Database = tenantDbName;
@@ -68,6 +71,8 @@ public class TenantService : ITenantService
             // Guardar el tenant en la base central
             _baseDbContext.Tenants.Add(tenant);
             await _baseDbContext.SaveChangesAsync();
+
+            await CreateDefaultDirectorUserAsync(tenantId, tenantConnectionString);
         }
         catch (Exception ex)
         {
@@ -80,5 +85,34 @@ public class TenantService : ITenantService
     public async Task<List<Tenant>> GetAllTenantsAsync()
     {
         return await _baseDbContext.Tenants.ToListAsync();
+    }
+    private async Task CreateDefaultDirectorUserAsync(string tenantId, string tenantConnectionString)
+    {
+        using var scope = _serviceProvider.CreateScope();
+        var tenantService = scope.ServiceProvider.GetRequiredService<ICurrentTenantService>();
+        await tenantService.SetTenantAsync(tenantId);
+
+        var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
+
+        var defaultDirector = new User
+        {
+            UserName = "director",
+            TenantId = tenantId,
+            PermissionLevel = null
+        };
+
+        var result = await userManager.CreateAsync(defaultDirector, "director123");
+        if (!result.Succeeded)
+        {
+            throw new InvalidOperationException($"Error al crear el usuario director por defecto: {string.Join(", ", result.Errors.Select(e => e.Description))}");
+        }
+
+        var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+        if (!await roleManager.RoleExistsAsync("Director"))
+        {
+            await roleManager.CreateAsync(new IdentityRole("Director"));
+        }
+
+        await userManager.AddToRoleAsync(defaultDirector, "Director");
     }
 }
