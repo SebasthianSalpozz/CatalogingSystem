@@ -8,7 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Npgsql;
 
 namespace CatalogingSystem.Services.Implementations;
-
+ 
 public class TenantService : ITenantService
 {
     private readonly BaseDbContext _baseDbContext;

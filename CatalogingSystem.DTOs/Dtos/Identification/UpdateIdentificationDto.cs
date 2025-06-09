@@ -1,9 +1,8 @@
 namespace CatalogingSystem.DTOs.Dtos;
 
 using CatalogingSystem.Core.Entities;
-using CatalogingSystem.Core.Enums;
 
-public class IdentificationDto
+public class UpdateIdentificationDto
 {
     public required Section Section { get; set; }
     public required long Inventory { get; set; }
@@ -17,5 +16,4 @@ public class IdentificationDto
     public required Material Material { get; set; }
     public required Technique Techniques { get; set; }
     public required string Observations { get; set; }
-    public required long Expediente { get; set; }
 }
