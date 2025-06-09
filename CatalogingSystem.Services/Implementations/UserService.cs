@@ -26,13 +26,16 @@ public class UserService : IUserService
 
     public async Task<User> CreateUserAsync(CreateUserRequestDto request)
     {
-        // Validar que el rol sea permitido
+        if (request.Role.Equals("SuperDirector", StringComparison.OrdinalIgnoreCase))
+        {
+            throw new InvalidOperationException("No se permite crear usuarios con el rol 'SuperDirector'.");
+        }
+        
         if (!Enum.TryParse<UserRole>(request.Role, true, out var role))
         {
             throw new InvalidOperationException($"Rol inválido: {request.Role}. Solo se permiten 'Director' e 'Investigador'.");
         }
 
-        // Validar el nivel de permisos para Investigadores
         InvestigatorPermissionLevel? permissionLevel = null;
         if (role == UserRole.Investigador)
         {
@@ -69,8 +72,7 @@ public class UserService : IUserService
         {
             await _roleManager.CreateAsync(new IdentityRole(request.Role));
         }
-
-        // Asignar el rol al usuario
+        
         await _userManager.AddToRoleAsync(user, request.Role);
 
         return user;
@@ -129,6 +131,10 @@ public class UserService : IUserService
         }
         if (!string.IsNullOrEmpty(request.Role))
         {
+            if (request.Role.Equals("SuperDirector", StringComparison.OrdinalIgnoreCase))
+            {
+                throw new InvalidOperationException("No se permite asignar el rol 'SuperDirector'.");
+            }
             var currentRoles = await _userManager.GetRolesAsync(user);
             await _userManager.RemoveFromRolesAsync(user, currentRoles);
             await _userManager.AddToRoleAsync(user, request.Role);

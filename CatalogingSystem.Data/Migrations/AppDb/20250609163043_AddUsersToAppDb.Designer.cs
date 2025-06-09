@@ -13,8 +13,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace CatalogingSystem.Data.Migrations.AppDb
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250529194013_AddUserPermision")]
-    partial class AddUserPermision
+    [Migration("20250609163043_AddUsersToAppDb")]
+    partial class AddUsersToAppDb
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -214,7 +214,6 @@ namespace CatalogingSystem.Data.Migrations.AppDb
                         .HasColumnType("text");
 
                     b.Property<string>("TenantId")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<bool>("TwoFactorEnabled")

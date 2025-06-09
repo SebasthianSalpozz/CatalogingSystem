@@ -211,7 +211,6 @@ namespace CatalogingSystem.Data.Migrations
                         .HasColumnType("text");
 
                     b.Property<string>("TenantId")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<bool>("TwoFactorEnabled")

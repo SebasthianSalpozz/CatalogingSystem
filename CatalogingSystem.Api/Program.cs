@@ -57,7 +57,7 @@ builder.Services.AddCors(options =>
 builder.Services.AddIdentity<User, IdentityRole>(options =>
 {
     options.Password.RequireDigit = true;
-    options.Password.RequiredLength = 6;
+    options.Password.RequiredLength = 8;
     options.Password.RequireNonAlphanumeric = false;
     options.Password.RequireUppercase = false;
     options.Password.RequireLowercase = false;
@@ -147,11 +147,13 @@ builder.Services.AddScoped<IGraphicDocumentationService, GraphicDocumentationSer
 builder.Services.AddScoped<ICatalogService, CatalogService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<SuperDirectorAuthService>();
 
 var app = builder.Build();
 
 // Apply migrations for all existing tenants
 await ApplyTenantMigrations.ApplyAllTenantMigrationsAsync(app.Services);
+await ProgramHelper.EnsureSuperDirectorExists(app.Services);
 
 app.UseCors(MyAllowSpecificOrigins);
 

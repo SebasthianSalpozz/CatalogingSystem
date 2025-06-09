@@ -19,7 +19,9 @@ public class TenantResolver
         StringValues tenantIdFromHeader;
         string? tenantId = null;
 
-        if (context.Request.Path.StartsWithSegments("/Tenants"))
+        if (context.Request.Path.StartsWithSegments("/Tenants") || 
+            context.Request.Path.StartsWithSegments("/SuperDirector") ||
+            context.Request.Path.Value.EndsWith("/Auth/super-login"))
         {
             await _next(context);
             return;

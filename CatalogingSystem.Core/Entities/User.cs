@@ -5,6 +5,6 @@ namespace CatalogingSystem.Core.Entities;
 
 public class User : IdentityUser
 {
-    public required string TenantId { get; set; }
-    public InvestigatorPermissionLevel? PermissionLevel { get; set; } // Nullable, solo para Investigadores
+    public string? TenantId { get; set; }
+    public InvestigatorPermissionLevel? PermissionLevel { get; set; } 
 }

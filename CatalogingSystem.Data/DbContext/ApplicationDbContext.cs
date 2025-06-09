@@ -102,6 +102,6 @@ public partial class ApplicationDbContext : IdentityDbContext<User>
 
         modelBuilder.Entity<User>()
             .Property(u => u.TenantId)
-            .IsRequired();
+            .IsRequired(false);
     }
 }
