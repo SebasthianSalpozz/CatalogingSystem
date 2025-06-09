@@ -1,9 +1,9 @@
-namespace CatalogingSystem.Api.Controllers;
-
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using CatalogingSystem.DTOs.Dtos;
 using CatalogingSystem.Services.Interfaces;
-using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
+
+namespace CatalogingSystem.Api.Controllers;
 
 [ApiController]
 [Route("[controller]")]
@@ -23,6 +23,7 @@ public class CatalogController : ControllerBase
     /// <param name="size">The number of items per page (default is 10).</param>
     /// <returns>A paginated list of catalog items with metadata.</returns>
     [HttpGet]
+    [Authorize(Policy = "ArchivoAdminRead")]
     public async Task<ActionResult<PagedResultDto<CatalogItemDto>>> GetCatalogItems(
         [FromQuery] int page = 1,
         [FromQuery] int size = 10)
@@ -41,6 +42,7 @@ public class CatalogController : ControllerBase
     /// <param name="size">The number of items per page (default is 10).</param>
     /// <returns>A paginated list of matching catalog items with metadata.</returns>
     [HttpGet("search")]
+    [Authorize(Policy = "ArchivoAdminRead")]
     public async Task<ActionResult<PagedResultDto<CatalogItemDto>>> GetCatalogItems(
         [FromQuery] long? expediente = null,
         [FromQuery] string? materialName = null,
@@ -70,15 +72,17 @@ public class CatalogController : ControllerBase
         var items = await _service.SearchCatalogItems(materialName, authorName, titleName, genericClassification, page, size);
         return Ok(items);
     }
+
     /// <summary>
     /// Deletes a catalog item and all related data by expediente.
     /// </summary>
     /// <param name="expediente">The expediente number.</param>
     /// <returns>NoContent if successful; otherwise, NotFound.</returns>
     [HttpDelete("{expediente:long}")]
+    [Authorize(Policy = "ArchivoAdminWrite")]
     public async Task<IActionResult> DeleteCatalogItem(long expediente)
     {
         var success = await _service.DeleteCatalogItem(expediente);
         return success ? NoContent() : NotFound();
-    }   
+    }
 }

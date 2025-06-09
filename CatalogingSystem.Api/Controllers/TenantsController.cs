@@ -1,11 +1,14 @@
-namespace CatalogingSystem.Api.Controllers;
-
+using Microsoft.AspNetCore.Mvc;
 using CatalogingSystem.DTOs.Dtos;
 using CatalogingSystem.Services.Interfaces;
-using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
+
+namespace CatalogingSystem.Api.Controllers;
 
 [ApiController]
 [Route("[controller]")]
+[Authorize(Roles = "SuperDirector")]
 public class TenantsController : ControllerBase
 {
     private readonly ITenantService _tenantService;
@@ -25,7 +28,7 @@ public class TenantsController : ControllerBase
         }
         catch (Exception ex)
         {
-            return StatusCode(500, new { message = $"Error al listar los tenants: {ex.Message}" });
+            return StatusCode(500, new { message = $"Error retrieving tenants: {ex.Message}" });
         }
     }
 
@@ -43,7 +46,7 @@ public class TenantsController : ControllerBase
         }
         catch (Exception ex)
         {
-            return StatusCode(500, new { message = $"Error al crear el tenant: {ex.Message}" });
+            return StatusCode(500, new { message = $"Error creating tenant: {ex.Message}" });
         }
     }
 }

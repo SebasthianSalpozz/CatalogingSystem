@@ -1,12 +1,12 @@
-// CatalogingSystem.Api/Swagger/AddTenantHeaderParameter.cs
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
+namespace Cataloging.Api.Swagger; 
 public class AddTenantHeaderParameter : IOperationFilter
 {
     public void Apply(OpenApiOperation operation, OperationFilterContext context)
     {
-        // Excluir los endpoints de TenantsController
+        // Exclude endpoints from TenantsController
         if (context.ApiDescription.ActionDescriptor.EndpointMetadata
             .Any(em => em is Microsoft.AspNetCore.Mvc.Controllers.ControllerActionDescriptor descriptor &&
                        descriptor.ControllerName == "Tenants"))
@@ -20,8 +20,8 @@ public class AddTenantHeaderParameter : IOperationFilter
         {
             Name = "tenant",
             In = ParameterLocation.Header,
-            Description = "Identificador del tenant (ej. tenant_BO-USFX-001)",
-            Required = false, 
+            Description = "Tenant identifier (e.g., tenant_BO-USFX-001)",
+            Required = false,
             Schema = new OpenApiSchema
             {
                 Type = "string"
